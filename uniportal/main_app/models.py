@@ -10,7 +10,7 @@ class Student(models.Model):
     student_batch = models.IntegerField(default=0)
     student_depart = models.CharField(max_length=100, default=0)
     student_contact = models.IntegerField(default=0)
-    image = models.ImageField(upload_to='media/studens/', default="")
+    image = models.ImageField(upload_to='students/', default="")
     # pub_date = models.DateField()
    
 
@@ -32,6 +32,7 @@ class LoginUser(models.Model):
     user_email = models.CharField(max_length=100, default="")
     user_password = models.CharField(max_length=100, default="")
     user_type = models.CharField(max_length=10, choices=YEAR_IN_SCHOOL_CHOICES, default="")
+    image = models.ImageField(upload_to='users/', default="")
     # user_type = models.IntegerField(default="")
     def __str__(self):
         return self.user_email

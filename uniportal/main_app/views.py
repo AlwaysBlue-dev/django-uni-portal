@@ -11,7 +11,6 @@ import base64
 import pandas as pd
 import seaborn as sns
 from .models import LoginUser
-from django.contrib.auth.decorators import login_required
 
 
 # Create your views here.
@@ -30,15 +29,21 @@ def user_login(request):
         # If a user was found, proceed to render the appropriate dashboard
         if user is not None:
             request.session['user_id'] = user.user_id
+
             if user.user_type == 'Student':
+
+                # context = {'user_id': request.session.get(['user_id']) }
                 # Render the student dashboard and set the URL to 'stu_dashboard'
-                return redirect('stu_dashboard')
+
+                return redirect('/stu_dashboard')
             elif user.user_type == 'HOD':
+
                 # Render the HOD dashboard and set the URL to 'hod_dashboard'
-                return redirect('hod_dashboard')
+                return redirect('/hod_dashboard')
             elif user.user_type == 'Teacher':
+
                 # Render the teacher dashboard and set the URL to 'tea_dashboard'
-                return redirect('tea_dashboard')
+                return redirect('/tea_dashboard')
         # If no user was found, return an error message on the login page
         else:
             error_message = 'Invalid login credentials'
@@ -50,24 +55,29 @@ def user_login(request):
             # If the user id is stored in the session, retrieve the user information from the LoginUser model
             user = LoginUser.objects.filter(
                 user_id=request.session['user_id']).first()
+
             # If the user was found, render the appropriate dashboard
             if user is not None:
+                user_id = request.session.get('user_id')
                 if user.user_type == 'Student':
+
                     # Set the URL to 'stu_dashboard'
-                    return redirect('stu_dashboard')
+                    return redirect('/stu_dashboard')
                 elif user.user_type == 'HOD':
+
                     # Set the URL to 'hod_dashboard'
-                    return redirect('hod_dashboard')
+
+                    return redirect('/hod_dashboard')
                 elif user.user_type == 'Teacher':
+
                     # Set the URL to 'tea_dashboard'
-                    return redirect('tea_dashboard')
+
+                    return redirect('/tea_dashboard')
             else:
                 return render(request, 'login.html')
         else:
             # If the user id is not stored in the session, render the login page
             return render(request, 'login.html')
-
-    return render(request, 'login.html')
 
 
 def user_logout(request):
@@ -82,24 +92,39 @@ def stu_dashboard_view(request):
     # Check if the user is logged in
     if 'user_id' not in request.session:
         return redirect('/login')
-    # Code for rendering the student dashboard
-    return render(request, 'stu_dashboard.html')
+    else:
+        user_id = request.session.get('user_id')
+        user = LoginUser.objects.get(user_id=user_id)
+        context = {'user': user}
+
+        # Code for rendering the student dashboard
+        return render(request, 'stu_dashboard.html', context)
 
 
 def hod_dashboard_view(request):
     # Check if the user is logged in
     if 'user_id' not in request.session:
         return redirect('/login')
+    else:
+        user_id = request.session.get('user_id')
+        user = LoginUser.objects.get(user_id=user_id)
+        context = {'user': user}
+
     # Code for rendering the HOD dashboard
-    return render(request, 'hod_dashboard.html')
+    return render(request, 'hod_dashboard.html', context)
 
 
 def tea_dashboard_view(request):
     # Check if the user is logged in
     if 'user_id' not in request.session:
         return redirect('/login')
+    else:
+        user_id = request.session.get('user_id')
+        user = LoginUser.objects.get(user_id=user_id)
+        context = {'user': user}
+
     # Code for rendering the teacher dashboard
-    return render(request, 'tea_dashboard.html')
+    return render(request, 'tea_dashboard.html', context)
 
 
 def upload_file(request):
@@ -116,7 +141,7 @@ def upload_file(request):
                         raise ValueError("Column 1 is required")
                     # Check if the data already exists in the database
                     instance, created = Student.objects.update_or_create(
-                        student_enrol_no=row[0], defaults={'student_name':row[1], 'student_email': row[2], 'student_roll_no': row[3], 'student_depart':row[4], 'student_batch':row[5], 'student_contact':row[6]})
+                        student_enrol_no=row[0], defaults={'student_name': row[1], 'student_email': row[2], 'student_roll_no': row[3], 'student_depart': row[4], 'student_batch': row[5], 'student_contact': row[6]})
                 messages.success(request, 'File uploaded successfully.')
                 return redirect('success_url')
             except Exception as e:
@@ -203,10 +228,10 @@ def plot_view(request):
     sns.countplot(x='student_batch', data=df)
 
     # Save the plot to an image file
-    plot_path = os.path.join('media/plot1.png')
+    plot_path = os.path.join('media/plots/plot1.png')
     plt1.savefig(plot_path)
 
-    plot_path2 = os.path.join('media/plot2.png')
+    plot_path2 = os.path.join('media/plots/plot2.png')
     plt2.savefig(plot_path2)
 
     return render(request, 'plot.html')

@@ -1,12 +1,19 @@
-{% extends 'base.html' %}
+{% extends 'sidebar_menu.html' %}
 
 {% block title %} HOD Dashboard {% endblock %}
 
 {% block style %}
 {% endblock %}
 
+{% if user %}
+
+{% block image %} <img class="img" text-center py-4 src={{user.image.url}}> {% endblock %}
+{% block username %} {{user.user_name}} {% endblock %}
+
+{% else %}
+    <!-- No User logged in -->
+{% endif %}
+
 {% block body %}
 
-<h1>This is HOD Dashboard</h1>
-<a href='/logout'>Logout</a>
 {% endblock %}
